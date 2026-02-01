@@ -1,12 +1,14 @@
 import { Link } from 'react-router';
-import { Calendar, Activity, CheckCircle, Circle, TrendingUp, Sparkles, AlertCircle, Award } from 'lucide-react';
+import { Calendar, Activity, CheckCircle, Circle, TrendingUp, Sparkles, AlertCircle, Award, Flame, Zap, Target } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useState } from 'react';
 import EmergencySupport from './EmergencySupport';
+import { Button } from '../ui/button';
 
 // Mock data for patient
 const patientData = {
-  name: 'Sarah',
+  name: 'Kim',
+  dayNumber: 15,
   nextSession: {
     date: 'January 18, 2026',
     time: '09:00 AM',
@@ -28,7 +30,11 @@ const patientData = {
     { date: 'Jan 18', mood: 8 },
   ],
   currentMood: 8,
-  streak: 7,
+  streak: 15, // Updated to match day 15
+  weeklyGoal: 7,
+  completed: 5,
+  totalPoints: 450,
+  nextReward: 500,
 };
 
 const motivationalTips = [
@@ -44,48 +50,134 @@ export default function PatientHomeScreen() {
   const [showEmergencySupport, setShowEmergencySupport] = useState(false);
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-[#4A90E2] to-[#7ED957] rounded-lg shadow-sm p-6 text-white">
-        <h1 className="text-2xl sm:text-3xl font-bold">Welcome back, {patientData.name}! 👋</h1>
-        <p className="mt-2 opacity-90">How are you feeling today?</p>
+    <div className="space-y-6 pb-20">
+      {/* Hero Welcome Section with Streak - BIG and VISIBLE */}
+      <div className="bg-gradient-to-r from-[#4A90E2] to-[#7ED957] rounded-lg shadow-lg p-8 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 opacity-10">
+          <Flame className="w-48 h-48" />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-3xl sm:text-4xl font-bold">¡Hola {patientData.name}!</h1>
+          <p className="text-xl opacity-90 mt-2">Día {patientData.dayNumber}</p>
+          
+          {/* HUGE STREAK DISPLAY */}
+          <div className="mt-6 flex items-center gap-4">
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-6 flex items-center gap-4">
+              <Flame className="w-16 h-16 text-orange-300 animate-pulse" />
+              <div>
+                <p className="text-6xl font-black">{patientData.streak}</p>
+                <p className="text-sm uppercase tracking-wide opacity-90">Días Seguidos</p>
+              </div>
+            </div>
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5" />
+                <span className="font-semibold">{patientData.totalPoints} puntos</span>
+              </div>
+              <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-white h-full transition-all duration-500"
+                  style={{ width: `${(patientData.totalPoints / patientData.nextReward) * 100}%` }}
+                />
+              </div>
+              <p className="text-sm opacity-75">{patientData.nextReward - patientData.totalPoints} puntos para próxima recompensa</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Current Mood</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{patientData.currentMood}/10</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Activity className="w-6 h-6 text-[#4A90E2]" />
-            </div>
+      {/* MAIN CTA - Start Daily Evaluation */}
+      <Link to="/patient/evaluation">
+        <Button className="w-full h-20 text-xl font-bold bg-gradient-to-r from-[#4A90E2] to-[#7ED957] hover:opacity-90 shadow-lg">
+          <Target className="w-8 h-8 mr-3" />
+          Iniciar Evaluación Diaria
+        </Button>
+      </Link>
+
+      {/* Quick Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="text-center">
+            <Activity className="w-8 h-8 text-[#4A90E2] mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">{patientData.currentMood}/10</p>
+            <p className="text-xs text-gray-600">Ánimo Actual</p>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Day Streak</p>
-              <p className="text-3xl font-bold text-[#7ED957] mt-1">{patientData.streak}</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-[#7ED957]" />
-            </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="text-center">
+            <CheckCircle className="w-8 h-8 text-[#7ED957] mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">{patientData.completed}/{patientData.weeklyGoal}</p>
+            <p className="text-xs text-gray-600">Esta Semana</p>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Completed Today</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{patientData.completedToday}</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-purple-600" />
-            </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="text-center">
+            <Award className="w-8 h-8 text-[#FFA500] mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">{patientData.completedToday}</p>
+            <p className="text-xs text-gray-600">Completadas Hoy</p>
           </div>
         </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="text-center">
+            <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">+15%</p>
+            <p className="text-xs text-gray-600">vs Semana Ant.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Tasks with Badge */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900">Tareas Pendientes</h2>
+            {patientData.pendingExercises.length > 0 && (
+              <span className="bg-[#FFA500] text-white text-xs font-bold px-2 py-1 rounded-full">
+                {patientData.pendingExercises.length}
+              </span>
+            )}
+          </div>
+          <Link
+            to="/patient/mood-tracker"
+            className="text-sm text-[#4A90E2] hover:underline"
+          >
+            Ver Todas
+          </Link>
+        </div>
+        {patientData.pendingExercises.length > 0 ? (
+          <div className="space-y-3">
+            {patientData.pendingExercises.map((exercise) => (
+              <div
+                key={exercise.id}
+                className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-[#4A90E2] hover:bg-blue-50 transition-all"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                    <Circle className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{exercise.name}</p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="text-sm text-gray-500">Vence: {exercise.dueDate}</span>
+                      <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
+                        {exercise.difficulty}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <Button className="bg-[#7ED957] hover:bg-[#6ec847]">
+                  Comenzar
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <CheckCircle className="w-12 h-12 mx-auto text-[#7ED957] mb-2" />
+            <p className="font-semibold">¡Todo completado! 🎉</p>
+            <p className="text-sm">¡Excelente trabajo!</p>
+          </div>
+        )}
       </div>
 
       {/* Next Session */}
@@ -110,54 +202,10 @@ export default function PatientHomeScreen() {
         </div>
       </div>
 
-      {/* Pending Exercises */}
+      {/* Mini Progress Graph */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Pending Exercises</h2>
-          <Link
-            to="/patient/mood-tracker"
-            className="text-sm text-[#4A90E2] hover:underline"
-          >
-            View All
-          </Link>
-        </div>
-        {patientData.pendingExercises.length > 0 ? (
-          <div className="space-y-3">
-            {patientData.pendingExercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-              >
-                <div className="flex items-center space-x-3">
-                  <Circle className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <p className="font-medium text-gray-900">{exercise.name}</p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-sm text-gray-500">Due: {exercise.dueDate}</span>
-                      <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
-                        {exercise.difficulty}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-[#7ED957] text-white rounded-lg hover:bg-[#6ec847] transition-colors">
-                  Start
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <CheckCircle className="w-12 h-12 mx-auto text-[#7ED957] mb-2" />
-            <p>All exercises completed! Great job! 🎉</p>
-          </div>
-        )}
-      </div>
-
-      {/* Mood Progress Graph */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Mood Journey (Last 7 Days)</h2>
-        <ResponsiveContainer width="100%" height={250}>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Tu Progreso Semanal</h2>
+        <ResponsiveContainer width="100%" height={200}>
           <LineChart data={patientData.moodData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="date" stroke="#6b7280" />
@@ -175,35 +223,6 @@ export default function PatientHomeScreen() {
         </ResponsiveContainer>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link
-          to="/patient/mood-tracker"
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Activity className="w-6 h-6 text-[#4A90E2]" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Track Mood</h3>
-              <p className="text-sm text-gray-600">Log how you're feeling today</p>
-            </div>
-          </div>
-        </Link>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-[#7ED957]" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Complete Exercises</h3>
-              <p className="text-sm text-gray-600">View and finish your tasks</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Motivational Tip */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
         <div className="flex items-start space-x-3">
@@ -215,25 +234,17 @@ export default function PatientHomeScreen() {
         </div>
       </div>
 
-      {/* Emergency Support */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <div className="flex items-start space-x-3">
-          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-1">Emergency Support</h3>
-            <p className="text-gray-700">Need immediate help? Click here.</p>
-          </div>
-        </div>
-        <button
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors mt-3"
-          onClick={() => setShowEmergencySupport(true)}
-        >
-          Get Support
-        </button>
-      </div>
-
       {/* Emergency Support Modal */}
       <EmergencySupport isOpen={showEmergencySupport} onClose={() => setShowEmergencySupport(false)} />
+
+      {/* Floating Panic Button - only show on desktop, mobile has bottom nav */}
+      <button
+        onClick={() => setShowEmergencySupport(true)}
+        className="hidden md:flex fixed bottom-6 right-6 w-16 h-16 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl items-center justify-center z-50 transition-all hover:scale-110"
+        aria-label="Botón de pánico"
+      >
+        <AlertCircle className="w-8 h-8" />
+      </button>
     </div>
   );
 }

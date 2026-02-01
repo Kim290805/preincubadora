@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router';
-import { Home, Calendar, Users, Activity, Bell, Menu, X, TrendingUp, Award } from 'lucide-react';
+import { Home, Calendar, Users, Activity, Bell, Menu, X, TrendingUp, Award, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { UserType } from '../App';
 
@@ -19,6 +19,7 @@ export default function Layout({ children, userType, setUserType }: LayoutProps)
     { path: '/psychologist/monitoring', icon: TrendingUp, label: 'Monitoring' },
     { path: '/psychologist/agenda', icon: Calendar, label: 'Agenda' },
     { path: '/notifications', icon: Bell, label: 'Notifications' },
+    { path: '/psychologist/settings', icon: Settings, label: 'Configuración' },
   ];
 
   const patientNavItems = [
